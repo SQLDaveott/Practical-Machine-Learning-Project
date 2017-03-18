@@ -95,5 +95,6 @@ Pred_rf
 ```
 ##Conclusion
 Any **Out of Sample Error** would be greater then the error in the sample. But 
-with a large sample, over 19K observations, and an accuracy of 0.997, one can 
-assume Out of Sample Error would be small and would be from overfitting.
+with a large sample, over 19K observations,using cross validation and an
+accuracy of 0.997, one can assume Out of Sample Error would be small and would 
+be from overfitting. 1.00-.997=.003 =.3%

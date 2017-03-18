@@ -167,32 +167,32 @@ mod_gbmfit&lt;-train(classe~.,data=training,trControl=train_control, method=&quo
 Pred_gbm&lt;-predict(mod_gbmfit,testing)
 #results
 confusionMatrix(Pred_gbm, testing$classe)$overall[1]</code></pre>
-<pre><code>## Accuracy 
-## 0.984833</code></pre>
+<pre><code>##  Accuracy 
+## 0.9858527</code></pre>
 <pre class="r"><code>confusionMatrix(Pred_gbm, testing$classe)$table</code></pre>
 <pre><code>##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2225   11    0    0    0
-##          B    7 1485   25    3    2
-##          C    0   22 1332   18    1
-##          D    0    0   10 1263   17
-##          E    0    0    1    2 1422</code></pre>
+##          A 2224   11    0    0    0
+##          B    7 1486    6    1   15
+##          C    0   21 1361   27    2
+##          D    1    0    1 1257   18
+##          E    0    0    0    1 1407</code></pre>
 </div>
 <div id="rf---random-forests" class="section level2">
 <h2>rf - Random forests</h2>
 <pre class="r"><code>mod_rf_fit&lt;-train(classe~.,data=training,trControl=train_control, method=&quot;rf&quot;)
 Pred_rf&lt;-predict(mod_rf_fit,testing)
 confusionMatrix(Pred_rf, testing$classe)$overall[1]</code></pre>
-<pre><code>## Accuracy 
-## 0.997196</code></pre>
+<pre><code>##  Accuracy 
+## 0.9970686</code></pre>
 <pre class="r"><code>confusionMatrix(Pred_rf, testing$classe)$table</code></pre>
 <pre><code>##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2230    2    0    0    0
-##          B    1 1514    6    0    1
-##          C    0    1 1362    5    0
-##          D    0    1    0 1281    4
-##          E    1    0    0    0 1437</code></pre>
+##          A 2231    4    0    0    0
+##          B    0 1513    2    0    2
+##          C    0    1 1366    8    0
+##          D    0    0    0 1278    5
+##          E    1    0    0    0 1435</code></pre>
 </div>
 <div id="lda---linear-discriminant-analysis" class="section level2">
 <h2>lda - Linear Discriminant Analysis</h2>
@@ -200,15 +200,15 @@ confusionMatrix(Pred_rf, testing$classe)$overall[1]</code></pre>
 Pred_cnb&lt;-predict(mod_cnb,testing)
 confusionMatrix(Pred_cnb, testing$classe)$overall[1]</code></pre>
 <pre><code>##  Accuracy 
-## 0.7114453</code></pre>
+## 0.7085139</code></pre>
 <pre class="r"><code>confusionMatrix(Pred_cnb, testing$classe)$table</code></pre>
 <pre><code>##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1857  203  150   79   56
-##          B   60  977  133   50  205
-##          C  125  209  883  162  127
-##          D  177   60  169  944  133
-##          E   13   69   33   51  921</code></pre>
+##          A 1796  209  138   68   60
+##          B   74  984  107   60  204
+##          C  158  215  920  156  132
+##          D  192   51  170  957  144
+##          E   12   59   33   45  902</code></pre>
 </div>
 <div id="analysis-of-the-models-model-choice-final-predictions" class="section level2">
 <h2>Analysis of the models, Model choice, final predictions</h2>
@@ -224,7 +224,7 @@ Pred_rf</code></pre>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
-<p>Any <strong>Out of Sample Error</strong> would be greater then the error in the sample. But with a large sample, over 19K observations, and an accuracy of 0.997, one can assume Out of Sample Error would be small and would be from overfitting.</p>
+<p>Any <strong>Out of Sample Error</strong> would be greater then the error in the sample. But with a large sample, over 19K observations,using cross validation and an accuracy of 0.997, one can assume Out of Sample Error would be small and would be from overfitting. 1.00-.997=.003 =.3%</p>
 </div>
 </div>
 
