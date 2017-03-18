@@ -9,22 +9,91 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Excutive Summary
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The goal of this project is to determine the activity performed by looking at 
+accelerometers on the belt, forearm, arm, and dumbell of 6 participants. 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+This report will show how the model was built, how cross validation is used, 
+what the expected out of sample error is, and why these choices were made.
+The prediction model will be used to predict 20 different test cases
 
-```{r cars}
-summary(cars)
+
+# Data Exploration and Data Cleansing
+When looking at the data there were several string that are set to NA.  Then 
+nearZeroVar is used to remove any variables that have near zero variance. Then 
+Variables  that have more than 60% na are removed. And finally remove the first
+five:X ,user_name,raw_timestamp_part_1,raw_timestamp_part_2,cvtd_timestamp. 
+These will have not impact on the model.
+
+```{r loadup, echo=TRUE, message=FALSE, warning=FALSE}
+# load with na set
+library(caret)
+library(gbm)
+library(randomForest)
+initial_testing = read.csv("~/rstudio/data/pml-testing.csv",na.strings=c("NA","#DIV/0!",""))
+initial_training = read.csv("~/rstudio/data/pml-training.csv",na.strings=c("NA","#DIV/0!",""))
+
+inTrain = createDataPartition(initial_training$classe, p = .6)[[1]]
+training = initial_training[ inTrain,]
+testing = initial_training[-inTrain,]
+# remove Near Zero Variables
+nzv_cols<-nearZeroVar(training)
+training<-training[,-nzv_cols]
+training <- training[ lapply(training, function(x) sum(is.na(x)) / length(x) ) <.60]
+#remove Identifying columns cola 1-5
+training<-training[-c(1:5)]
+# Make sure test set has the same variabales
+cols_used<-names(training)
+testing<-testing[cols_used]
 ```
+# Models
+For Cross Validation a K-Fold of 3 is used, no difference was seen when using 
+K-Fold of 5 and K-Fold of 3.
 
-## Including Plots
+Three models were chosen are gbm(Stochastic Gradient Boosting), 
+rf(Random forests) and lda (Linear Discriminant Analysis)
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+## gbm - Stochastic Gradient Boosting
+```{r gbm, message=FALSE, warning=FALSE}
+# set seed
+set.seed(62433)
+# set cross validation
+train_control <- trainControl(method="cv", number=5)
+#fit model , predict test
+mod_gbmfit<-train(classe~.,data=training,trControl=train_control, method="gbm",verbose=FALSE)
+Pred_gbm<-predict(mod_gbmfit,testing)
+#results
+confusionMatrix(Pred_gbm, testing$classe)$overall[1]
+confusionMatrix(Pred_gbm, testing$classe)$table
 ```
+## rf - Random forests
+```{r rf, message=FALSE, warning=FALSE}
+mod_rf_fit<-train(classe~.,data=training,trControl=train_control, method="rf")
+Pred_rf<-predict(mod_rf_fit,testing)
+confusionMatrix(Pred_rf, testing$classe)$overall[1]
+confusionMatrix(Pred_rf, testing$classe)$table
+```
+## lda - Linear Discriminant Analysis
+```{r lda, message=FALSE, warning=FALSE}
+mod_cnb<-train(classe~.,data=training,trControl=train_control, method="lda")
+Pred_cnb<-predict(mod_cnb,testing)
+confusionMatrix(Pred_cnb, testing$classe)$overall[1]
+confusionMatrix(Pred_cnb, testing$classe)$table
+```
+## Analysis of the models, Model choice, final predictions
+Reviewing the model result Random Forests is the best fit, Stochastic Gradient 
+Boosting(glm) being a close second and Linear Discriminant Analysis coming in
+last.
+```{r final, message=FALSE, warning=FALSE}
+initial_training<-initial_training[cols_used]
+initial_testing<-initial_testing[cols_used[1:53]]
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+mod_rf_final_fit<-train(classe~.,data=initial_training,trControl=train_control, method="rf")
+Pred_rf<-predict(mod_rf_final_fit,initial_testing)
+Pred_rf
+```
+##Conclusion
+Any **Out of Sample Error** would be greater then the error in the sample. But 
+with a large sample, over 19K observations, and an accuracy of 0.997, one can 
+assume Out of Sample Error would be small.
